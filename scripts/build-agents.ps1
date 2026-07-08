@@ -20,8 +20,6 @@ if ($modules.Count -eq 0) {
 New-Item -ItemType Directory -Force -Path $OutputDir | Out-Null
 
 $parts = [System.Collections.Generic.List[string]]::new()
-$parts.Add("<!-- This file is generated from src. Edit those modules, then run the build script. -->")
-$parts.Add("")
 
 foreach ($module in $modules) {
     $parts.Add((Get-Content -LiteralPath $module.FullName -Raw).Trim())

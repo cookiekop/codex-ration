@@ -24,7 +24,6 @@ mapfile -t modules < <(printf '%s\n' "${modules[@]}" | sort)
 mkdir -p "$output_dir"
 
 {
-  printf '<!-- This file is generated from src. Edit those modules, then run the build script. -->\n\n'
   for module in "${modules[@]}"; do
     sed -e '${/^$/d;}' "$module"
     printf '\n\n'
