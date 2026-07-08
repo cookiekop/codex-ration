@@ -13,6 +13,11 @@
   maintenance tasks.
 - Prefer checked-in scripts over manual multi-step instructions.
 
+### Testing
+
+- Treat tests as important verification for code changes; prefer focused tests
+  under `tests/`.
+
 ### Dependencies
 
 - Prefer `thirdparties/` for vendored dependencies and submodules.

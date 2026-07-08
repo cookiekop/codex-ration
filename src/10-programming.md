@@ -8,6 +8,9 @@
   readability.
 - Prefer shape comments or annotations for tensors and arrays, especially
   `np.ndarray` and `torch.Tensor`.
+- Prefer `pytest` configured in `pyproject.toml`, verified with
+  `uv run pytest`; include CLI smoke tests for `[project.scripts]` entry
+  points.
 
 ### C/C++
 
@@ -19,5 +22,6 @@
 - Prefer lowercase names for local variables and parameters.
 - Prefer leading underscore members for private/internal C++ storage unless the
   project has an established different convention.
+- Prefer GoogleTest for C/C++ test cases, integrated through CMake.
 - Prefer an explicit boundary between public API and private implementation.
 - Keep build, install, and packaging rules aligned with that boundary.
