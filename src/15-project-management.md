@@ -15,8 +15,8 @@
 
 ### Testing
 
-- Treat tests as important verification for code changes; prefer focused tests
-  under `tests/`.
+- Prefer a small number of strong, thorough tests under `tests/`; cover code
+  with randomized inputs where practical.
 
 ### Dependencies
 
