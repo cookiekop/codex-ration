@@ -6,6 +6,7 @@
 - Keep `README.md` focused on purpose, requirements, setup, build, and links to
   deeper docs.
 - Put detailed feature, API, and integration docs under `docs/`.
+- Keep `README.md` and `docs/` updated with code changes.
 
 ### Automation
 
