@@ -1,0 +1,10 @@
+*.bak
+*.tmp
+*.swp
+*~
+
+# Local validation scratch space.
+.tmp/
+
+# Generated install target.
+dotfile/AGENTS.md
