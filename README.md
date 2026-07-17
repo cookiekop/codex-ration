@@ -7,6 +7,10 @@ This repo intentionally does not manage `~/.codex/config.toml`. Codex config can
 contain machine-local project trust paths and other local state, so this project
 only owns durable global guidance.
 
+The installer also installs Matt Pocock's `grill-me` and companion `grilling`
+skills globally for Codex. This requires `uv`; no Node.js installation is
+needed.
+
 ## Layout
 
 - `src/` - source modules for the global guidance file.
@@ -50,4 +54,5 @@ Bash:
 ```
 
 The installer creates `~/.codex` if needed, backs up an existing non-matching
-`~/.codex/AGENTS.md`, and symlinks it to `dotfile/AGENTS.md` in this repo.
+`~/.codex/AGENTS.md`, symlinks it to `dotfile/AGENTS.md` in this repo, and
+installs the `grill-me` and `grilling` skills for Codex.

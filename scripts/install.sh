@@ -7,6 +7,8 @@ build_script="$repo_root/scripts/build-agents.sh"
 source_file="$repo_root/dotfile/AGENTS.md"
 codex_home="${CODEX_HOME:-$HOME/.codex}"
 destination="$codex_home/AGENTS.md"
+skills_destination="$codex_home/skills"
+skill_installer="$skills_destination/.system/skill-installer/scripts/install-skill-from-github.py"
 
 "$build_script"
 mkdir -p "$codex_home"
@@ -36,4 +38,27 @@ if [[ "$needs_link" -eq 1 ]]; then
   printf 'Linked %s -> %s\n' "$destination" "$source_file"
 else
   printf 'Symlink already current: %s\n' "$destination"
+fi
+
+skill_paths=()
+for skill_name in grill-me grilling; do
+  if [[ ! -d "$skills_destination/$skill_name" ]]; then
+    skill_paths+=("skills/productivity/$skill_name")
+  fi
+done
+
+if [[ "${#skill_paths[@]}" -gt 0 ]]; then
+  if ! command -v uv >/dev/null 2>&1; then
+    printf 'uv is required to install Codex skills. Install uv and rerun this script.\n' >&2
+    exit 1
+  fi
+  if [[ ! -f "$skill_installer" ]]; then
+    printf "Codex's built-in skill installer was not found at %s.\n" "$skill_installer" >&2
+    exit 1
+  fi
+
+  uv run --no-project python "$skill_installer" \
+    --repo mattpocock/skills --path "${skill_paths[@]}" --dest "$skills_destination"
+else
+  printf 'Codex skills already installed: grill-me, grilling\n'
 fi
