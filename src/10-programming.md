@@ -6,6 +6,7 @@
 - Prefer `[project.scripts]` in `pyproject.toml` for Python CLI entry points.
 - Prefer explicit Python type annotations for variables when they improve
   readability.
+- Use `pyright` for static type checking and linting.
 - Prefer shape comments or annotations for tensors and arrays, especially
   `np.ndarray` and `torch.Tensor`.
 - Prefer `pytest` configured in `pyproject.toml`, verified with
