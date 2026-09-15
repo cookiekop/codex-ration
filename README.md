@@ -5,16 +5,19 @@ Personal global Codex guidance, maintained as modular Markdown and installed as
 
 This repo intentionally does not manage `~/.codex/config.toml`. Codex config can
 contain machine-local project trust paths and other local state, so this project
-only owns durable global guidance.
+only manages global guidance and the Herdr configuration below.
 
 The installer also installs Matt Pocock's `grill-me` and companion `grilling`
-skills globally for Codex. This requires `uv`; no Node.js installation is
-needed.
+skills globally for Codex, plus [Herdr](https://herdr.dev/docs/install/) when it
+is missing. Skill installation requires `uv` and Codex's built-in skill
+installer. Herdr installation requires internet access and `curl` on Linux/macOS
+or Windows PowerShell on Windows.
 
 ## Layout
 
 - `src/` - source modules for the global guidance file.
 - `dotfile/AGENTS.md` - generated file installed into Codex.
+- `dotfile/herdr/config.toml` - Herdr config with Nord theme and tmux-style keys.
 - `scripts/build-agents.ps1` - Windows/PowerShell build script.
 - `scripts/build-agents.sh` - Bash build script.
 - `scripts/install.ps1` - Windows/PowerShell symlink installer.
@@ -55,4 +58,21 @@ Bash:
 
 The installer creates `~/.codex` if needed, backs up an existing non-matching
 `~/.codex/AGENTS.md`, symlinks it to `dotfile/AGENTS.md` in this repo, and
-installs the `grill-me` and `grilling` skills for Codex.
+installs the `grill-me` and `grilling` skills for Codex, and installs Herdr using
+its official installer if it is missing. Existing Herdr installations are kept.
+
+It symlinks `dotfile/herdr/config.toml` to Herdr's
+[config location](https://herdr.dev/docs/configuration/):
+
+- Linux/macOS: `~/.config/herdr/config.toml`.
+- Windows: `%APPDATA%\herdr\config.toml`.
+
+Existing configs or links to other targets are backed up beside the destination
+before replacement; correct symlinks are left alone. Edit the repo's config to
+update the linked file. On Windows, enable Developer Mode or use an elevated
+shell to create symlinks. The config disables onboarding and automatic theme switching,
+uses Nord and Herdr toast delivery, hides agent labels on pane borders, and sets
+`Ctrl-b` as the prefix with tmux-style tab, split, navigation, zoom, and detach keys.
+
+On Linux/macOS, Herdr defaults to `~/.local/bin` (override with
+`HERDR_INSTALL_DIR`). Follow the official installer's PATH instructions if needed.

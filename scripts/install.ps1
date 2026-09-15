@@ -12,50 +12,50 @@ $Destination = Join-Path $CodexHome "AGENTS.md"
 $SkillsDestination = Join-Path $CodexHome "skills"
 $SkillInstaller = Join-Path $SkillsDestination ".system/skill-installer/scripts/install-skill-from-github.py"
 
-& $BuildScript
+function Install-Symlink {
+    param([string]$Source, [string]$Destination)
 
-New-Item -ItemType Directory -Force -Path $CodexHome | Out-Null
-
-$expectedTarget = [System.IO.Path]::GetFullPath($Source)
-$needsLink = $true
-$timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
-
-if (Test-Path -LiteralPath $Destination) {
-    $existing = Get-Item -LiteralPath $Destination -Force
-    $isSymlink = [bool]($existing.Attributes -band [System.IO.FileAttributes]::ReparsePoint)
-    if ($isSymlink -and $existing.Target) {
-        $currentTarget = [System.IO.Path]::GetFullPath([string]$existing.Target)
-        if ($currentTarget -eq $expectedTarget) {
-            $needsLink = $false
+    $parent = Split-Path -Parent $Destination
+    New-Item -ItemType Directory -Force -Path $parent | Out-Null
+    $expectedTarget = [System.IO.Path]::GetFullPath($Source)
+    $existing = Get-Item -LiteralPath $Destination -Force -ErrorAction SilentlyContinue
+    if ($null -ne $existing) {
+        $isSymlink = [bool]($existing.Attributes -band [System.IO.FileAttributes]::ReparsePoint)
+        if ($isSymlink -and $existing.Target) {
+            $currentTarget = [string]$existing.Target
+            if (-not [System.IO.Path]::IsPathRooted($currentTarget)) {
+                $currentTarget = Join-Path $parent $currentTarget
+            }
+            if ([System.IO.Path]::GetFullPath($currentTarget) -eq $expectedTarget) {
+                Write-Host "Symlink already current: $Destination"
+                return
+            }
         }
     }
-}
 
-if ($needsLink) {
-    $probe = Join-Path $CodexHome ".AGENTS.md.symlink-probe-$timestamp"
+    $suffix = "$(Get-Date -Format 'yyyyMMdd-HHmmss')-$([guid]::NewGuid())"
+    $probe = Join-Path $parent ".symlink-probe-$suffix"
     try {
         New-Item -ItemType SymbolicLink -Path $probe -Target $Source | Out-Null
     } catch {
-        throw "Failed to create temporary symlink in $CodexHome. On Windows, run from an elevated shell or enable Developer Mode. Original AGENTS.md was left unchanged. $($_.Exception.Message)"
+        throw "Failed to create temporary symlink in $parent. On Windows, run from an elevated shell or enable Developer Mode. Original $Destination was left unchanged. $($_.Exception.Message)"
     } finally {
         if (Test-Path -LiteralPath $probe) {
             Remove-Item -LiteralPath $probe -Force
         }
     }
 
-    if (Test-Path -LiteralPath $Destination) {
-        $backup = "$Destination.backup-$timestamp"
+    if ($null -ne $existing) {
+        $backup = "$Destination.backup-$suffix"
         Move-Item -LiteralPath $Destination -Destination $backup
-        Write-Host "Backed up existing AGENTS.md to $backup"
+        Write-Host "Backed up $Destination to $backup"
     }
-}
-
-if ($needsLink) {
     New-Item -ItemType SymbolicLink -Path $Destination -Target $Source | Out-Null
     Write-Host "Linked $Destination -> $Source"
-} else {
-    Write-Host "Symlink already current: $Destination"
 }
+
+& $BuildScript
+Install-Symlink -Source $Source -Destination $Destination
 
 $skillPaths = @()
 foreach ($skillName in @("grill-me", "grilling")) {
@@ -83,3 +83,30 @@ if ($skillPaths.Count -gt 0) {
 } else {
     Write-Host "Codex skills already installed: grill-me, grilling"
 }
+
+$HerdrInstallDir = if ($env:HERDR_INSTALL_DIR) {
+    $env:HERDR_INSTALL_DIR
+} else {
+    Join-Path $env:LOCALAPPDATA "Programs/Herdr/bin"
+}
+if ((Get-Command herdr -ErrorAction SilentlyContinue) -or
+    (Test-Path -LiteralPath (Join-Path $HerdrInstallDir "herdr.exe") -PathType Leaf)) {
+    Write-Host "Herdr already installed."
+} else {
+    $HerdrInstaller = Join-Path ([System.IO.Path]::GetTempPath()) "herdr-install-$([guid]::NewGuid()).ps1"
+    try {
+        Invoke-WebRequest -Uri "https://herdr.dev/install.ps1" -OutFile $HerdrInstaller -UseBasicParsing
+        & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $HerdrInstaller
+        if ($LASTEXITCODE -ne 0) {
+            throw "Failed to install Herdr."
+        }
+    } finally {
+        if (Test-Path -LiteralPath $HerdrInstaller) {
+            Remove-Item -LiteralPath $HerdrInstaller -Force
+        }
+    }
+}
+
+$HerdrSource = Join-Path $RepoRoot "dotfile/herdr/config.toml"
+$HerdrDestination = Join-Path $env:APPDATA "herdr/config.toml"
+Install-Symlink -Source $HerdrSource -Destination $HerdrDestination
