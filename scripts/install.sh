@@ -67,3 +67,16 @@ else
 fi
 
 install_symlink "$repo_root/dotfile/herdr/config.toml" "$HOME/.config/herdr/config.toml"
+
+# SSH commands may read .bashrc and return before its interactive setup.
+printf -v path_line 'export PATH=%q:"$PATH"' "$herdr_install_dir"
+for profile in "$HOME/.profile" "$HOME/.bashrc"; do
+  if [[ -f "$profile" ]] && grep -Fxq -- "$path_line" "$profile"; then continue; fi
+  if [[ -e "$profile" || -L "$profile" ]]; then
+    cp -a -- "$profile" "$profile.backup-$(date +%Y%m%d-%H%M%S)-$$"
+  fi
+  temporary="$(mktemp "${profile}.XXXXXX")"
+  { printf '# Herdr user commands\n%s\n' "$path_line"; [[ ! -f "$profile" ]] || cat -- "$profile"; } > "$temporary"
+  [[ ! -f "$profile" ]] || chmod --reference="$profile" "$temporary"
+  mv -- "$temporary" "$profile"
+done

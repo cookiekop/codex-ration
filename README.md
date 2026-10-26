@@ -77,4 +77,7 @@ uses Nord and Herdr toast delivery, hides agent labels on pane borders, and sets
 `Ctrl-b` as the prefix with tmux-style tab, split, navigation, zoom, and detach keys.
 
 On Linux/macOS, Herdr defaults to `~/.local/bin` (override with
-`HERDR_INSTALL_DIR`). Follow the official installer's PATH instructions if needed.
+`HERDR_INSTALL_DIR`). The Bash installer backs up and adds the install directory
+to `.profile` and `.bashrc`, so login shells and noninteractive SSH commands can
+find Herdr. Existing profile contents are preserved; repeated installs do not
+duplicate the PATH entry. Other shells may need their usual PATH configuration.
