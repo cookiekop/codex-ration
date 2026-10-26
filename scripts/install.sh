@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+install_herdr=true
+case "${1:-}" in
+  --without-herdr) install_herdr=false; shift ;;
+  '') ;;
+  *) printf 'Usage: %s [--without-herdr]\n' "$0" >&2; exit 1 ;;
+esac
+[[ $# -eq 0 ]] || { printf 'Unexpected arguments\n' >&2; exit 1; }
+
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 repo_root="$(cd -- "$script_dir/.." && pwd)"
 build_script="$repo_root/scripts/build-agents.sh"
@@ -51,6 +59,8 @@ for skill_name in grill-me grilling; do
     printf 'Installed pinned skill: %s\n' "$skill_name"
   fi
 done
+
+[[ "$install_herdr" == true ]] || exit 0
 
 herdr_install_dir="${HERDR_INSTALL_DIR:-$HOME/.local/bin}"
 if command -v herdr >/dev/null 2>&1 || [[ -x "$herdr_install_dir/herdr" ]]; then

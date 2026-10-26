@@ -58,6 +58,10 @@ git submodule update --init --recursive
 ./scripts/install.sh
 ```
 
+For hosts such as VPSs that need only Codex guidance and skills, use
+`./scripts/install.sh --without-herdr`. This leaves Herdr binaries, configuration,
+and shell startup files unmanaged; it does not uninstall an existing Herdr.
+
 The installer creates `~/.codex` if needed, backs up an existing non-matching
 `~/.codex/AGENTS.md`, symlinks it to `dotfile/AGENTS.md` in this repo, and
 installs the `grill-me` and `grilling` skills for Codex, and installs Herdr using
