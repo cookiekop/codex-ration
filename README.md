@@ -9,8 +9,9 @@ only manages global guidance and the Herdr configuration below.
 
 The installer also installs Matt Pocock's `grill-me` and companion `grilling`
 skills globally for Codex, plus [Herdr](https://herdr.dev/docs/install/) when it
-is missing. Skill installation requires `uv` and Codex's built-in skill
-installer. Herdr installation requires internet access and `curl` on Linux/macOS
+is missing. Linux skill installation uses the pinned `thirdparties/skills`
+submodule and works before Codex or `uv` is installed. The Windows installer
+currently requires `uv` and Codex's built-in skill installer. Herdr installation requires internet access and `curl` on Linux/macOS
 or Windows PowerShell on Windows.
 
 ## Layout
@@ -53,6 +54,7 @@ PowerShell:
 Bash:
 
 ```bash
+git submodule update --init --recursive
 ./scripts/install.sh
 ```
 

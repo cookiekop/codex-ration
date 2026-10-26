@@ -1,0 +1,3 @@
+[submodule "thirdparties/skills"]
+	path = thirdparties/skills
+	url = https://github.com/mattpocock/skills.git
